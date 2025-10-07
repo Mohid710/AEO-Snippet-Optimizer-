@@ -7,12 +7,12 @@
   
   <!-- Tailwind CSS -->
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  
-  <!-- Tailwind Typography (for better HTML rendering in AI results) -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tailwindcss/typography@0.5.9/dist/typography.min.css">
 
-  <!-- Axios -->
+  <!-- Axios + PDF + Excel -->
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 
 <body class="bg-gray-50 text-gray-900">
@@ -62,10 +62,16 @@
       <p class="text-gray-600 mt-2">Analyzing snippets, please wait...</p>
     </div>
 
-    <!-- ✅ Updated Result Section -->
+    <!-- Result Section -->
     <div id="result" class="mt-10 bg-white rounded-xl shadow-lg p-8 hidden">
       <h4 class="text-2xl font-bold mb-4 text-blue-700">AI Comparative Analysis Result</h4>
-      <div id="resultText" class="prose prose-blue max-w-none text-gray-800 leading-relaxed"></div>
+      <div id="resultText" class="whitespace-pre-wrap text-gray-800 leading-relaxed"></div>
+
+      <!-- Download Buttons -->
+      <div class="mt-6 flex flex-wrap gap-4 justify-center">
+        <button id="downloadPdf" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-5 rounded-lg shadow transition">📄 Download Professional PDF Report</button>
+        <button id="downloadExcel" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-5 rounded-lg shadow transition">📊 Download Excel Report</button>
+      </div>
     </div>
   </section>
 
@@ -102,16 +108,59 @@
 
       try {
         const response = await axios.post('/api/analyze', { snippetA, snippetB });
-
-        // ✅ Render formatted HTML returned by GPT-4 Turbo
-        resultText.innerHTML = response.data.analysis;
+        resultText.textContent = response.data.analysis;
         resultSection.classList.remove('hidden');
       } catch (error) {
-        resultText.innerHTML = `<p class="text-red-600 font-semibold">An error occurred: ${error.response?.data?.message || error.message}</p>`;
+        resultText.textContent = "An error occurred: " + (error.response?.data?.message || error.message);
         resultSection.classList.remove('hidden');
       } finally {
         loading.classList.add('hidden');
       }
+    });
+
+    // 📄 Professional PDF Download
+    document.getElementById('downloadPdf').addEventListener('click', () => {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ unit: "pt", format: "a4" });
+
+      const logo = "https://upload.wikimedia.org/wikipedia/commons/a/ab/Logo_TV_2022.svg"; // replace with your logo if available
+      const title = "AEO Snippet Optimizer — Comparative Analysis Report";
+      const content = document.getElementById('resultText').innerText;
+      const date = new Date().toLocaleString();
+
+      // Header
+      doc.setFontSize(18);
+      doc.text(title, 40, 50);
+      doc.setFontSize(10);
+      doc.text(`Generated on: ${date}`, 40, 70);
+
+      // Add logo
+      doc.addImage(logo, "PNG", 450, 30, 100, 50);
+
+      // Body
+      doc.setFontSize(12);
+      const lines = doc.splitTextToSize(content, 520);
+      doc.text(lines, 40, 120);
+
+      // Footer
+      doc.setFontSize(10);
+      doc.text("© 2025 AEO Snippet Optimizer — Powered by AI & OpenRouter GPT-4 Turbo", 40, 780);
+
+      doc.save("AEO_Comparative_Analysis_Report.pdf");
+    });
+
+    // 📊 Excel Download
+    document.getElementById('downloadExcel').addEventListener('click', () => {
+      const content = document.getElementById('resultText').innerText;
+      const ws = XLSX.utils.aoa_to_sheet([
+        ["AEO Snippet Optimizer - Comparative Report"],
+        ["Generated on:", new Date().toLocaleString()],
+        [""],
+        [content]
+      ]);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "AEO Analysis");
+      XLSX.writeFile(wb, "AEO_Analysis_Report.xlsx");
     });
   </script>
 </body>
