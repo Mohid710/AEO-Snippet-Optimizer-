@@ -23,7 +23,8 @@ If you cannot output JSON, return a short plain-text summary. Keep result_text <
     const userPrompt = `Snippet A:\n${snippetA}\n\nSnippet B:\n${snippetB}\n\nGive a comparison using the requested format.`;
 
     const fetchBody = {
-      model: "openrouter/openai/gpt-4-turbo",
+     model: "gpt-4o",
+
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: userPrompt }
