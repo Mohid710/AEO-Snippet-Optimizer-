@@ -90,7 +90,7 @@
   </footer>
 
   <!-- JavaScript -->
-  <script>
+    <script>
     document.getElementById('analyzeBtn').addEventListener('click', async () => {
       const snippetA = document.getElementById('snippetA').value.trim();
       const snippetB = document.getElementById('snippetB').value.trim();
@@ -99,19 +99,26 @@
       const resultText = document.getElementById('resultText');
 
       if (!snippetA || !snippetB) {
-        alert("Please enter both snippets before analysis.");
+        alert("⚠️ Please enter both snippets before analysis.");
         return;
       }
 
       loading.classList.remove('hidden');
       resultSection.classList.add('hidden');
+      resultText.innerHTML = ""; // clear previous content
 
       try {
         const response = await axios.post('/api/analyze', { snippetA, snippetB });
-        resultText.textContent = response.data.analysis;
+
+        // ✅ Fix: Show the response safely as formatted text
+        const aiResult = response.data.analysis || "No response received from AI.";
+        resultText.innerText = aiResult;
+
+        // Show result box
         resultSection.classList.remove('hidden');
       } catch (error) {
-        resultText.textContent = "An error occurred: " + (error.response?.data?.message || error.message);
+        console.error(error);
+        resultText.innerText = "❌ An error occurred: " + (error.response?.data?.message || error.message);
         resultSection.classList.remove('hidden');
       } finally {
         loading.classList.add('hidden');
@@ -123,24 +130,20 @@
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF({ unit: "pt", format: "a4" });
 
-      const logo = "https://upload.wikimedia.org/wikipedia/commons/a/ab/Logo_TV_2022.svg"; // replace with your logo if available
       const title = "AEO Snippet Optimizer — Comparative Analysis Report";
       const content = document.getElementById('resultText').innerText;
       const date = new Date().toLocaleString();
 
       // Header
       doc.setFontSize(18);
-      doc.text(title, 40, 50);
+      doc.text(title, 40, 60);
       doc.setFontSize(10);
-      doc.text(`Generated on: ${date}`, 40, 70);
-
-      // Add logo
-      doc.addImage(logo, "PNG", 450, 30, 100, 50);
+      doc.text(`Generated on: ${date}`, 40, 80);
 
       // Body
       doc.setFontSize(12);
       const lines = doc.splitTextToSize(content, 520);
-      doc.text(lines, 40, 120);
+      doc.text(lines, 40, 110);
 
       // Footer
       doc.setFontSize(10);
@@ -151,7 +154,12 @@
 
     // 📊 Excel Download
     document.getElementById('downloadExcel').addEventListener('click', () => {
-      const content = document.getElementById('resultText').innerText;
+      const content = document.getElementById('resultText').innerText.trim();
+      if (!content) {
+        alert("⚠️ No result available to download yet.");
+        return;
+      }
+
       const ws = XLSX.utils.aoa_to_sheet([
         ["AEO Snippet Optimizer - Comparative Report"],
         ["Generated on:", new Date().toLocaleString()],
@@ -163,5 +171,3 @@
       XLSX.writeFile(wb, "AEO_Analysis_Report.xlsx");
     });
   </script>
-</body>
-</html>
