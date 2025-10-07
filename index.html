@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AEO Snippet Optimizer — Smart SEO Insights</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+
+<body class="bg-gray-50 text-gray-900">
+  <!-- Header -->
+  <header class="bg-white shadow-md sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+      <h1 class="text-2xl font-extrabold text-blue-700">AEO Snippet Optimizer</h1>
+      <nav>
+        <a href="#compare" class="text-gray-600 hover:text-blue-700 font-medium px-4">Compare</a>
+        <a href="#about" class="text-gray-600 hover:text-blue-700 font-medium px-4">About</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="text-center py-16 bg-gradient-to-br from-blue-50 to-indigo-100">
+    <h2 class="text-4xl font-extrabold mb-4 text-gray-800">Boost Your SEO with AI-Powered Snippet Comparison</h2>
+    <p class="text-gray-600 text-lg mb-8">Compare and optimize your Answer Engine Optimization (AEO) snippets using advanced AI insights.</p>
+    <a href="#compare" class="bg-blue-700 hover:bg-blue-800 text-white font-semibold py-3 px-6 rounded-lg shadow-lg transition transform hover:-translate-y-1">Try Now — It’s Free!</a>
+  </section>
+
+  <!-- Comparison Tool -->
+  <section id="compare" class="max-w-5xl mx-auto px-6 py-16">
+    <h3 class="text-3xl font-bold text-center mb-10 text-gray-800">Compare Two Snippets Instantly</h3>
+
+    <div class="grid md:grid-cols-2 gap-8 mb-8">
+      <div>
+        <label class="block text-sm font-semibold mb-2 text-gray-700">Snippet A</label>
+        <textarea id="snippetA" class="w-full p-4 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 h-48 resize-none" placeholder="Paste your first snippet here..."></textarea>
+      </div>
+
+      <div>
+        <label class="block text-sm font-semibold mb-2 text-gray-700">Snippet B</label>
+        <textarea id="snippetB" class="w-full p-4 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 h-48 resize-none" placeholder="Paste your second snippet here..."></textarea>
+      </div>
+    </div>
+
+    <div class="text-center">
+      <button id="analyzeBtn" class="bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition transform hover:-translate-y-1">
+        Analyze with AI
+      </button>
+    </div>
+
+    <!-- Loading Animation -->
+    <div id="loading" class="hidden text-center mt-6">
+      <div class="inline-block w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+      <p class="text-gray-600 mt-2">Analyzing snippets, please wait...</p>
+    </div>
+
+    <!-- Result Section -->
+    <div id="result" class="mt-10 bg-white rounded-xl shadow-md p-6 hidden">
+      <h4 class="text-2xl font-semibold mb-4 text-blue-700">AI Comparative Analysis Result</h4>
+      <pre id="resultText" class="whitespace-pre-wrap text-gray-800 leading-relaxed"></pre>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section id="about" class="bg-white py-16">
+    <div class="max-w-5xl mx-auto px-6 text-center">
+      <h3 class="text-3xl font-bold mb-4 text-gray-800">Why AEO Matters?</h3>
+      <p class="text-gray-600 text-lg mb-6">Answer Engine Optimization helps your content stand out in AI-driven search results, voice assistants, and smart snippets. By comparing snippets, you identify which performs better in modern search contexts.</p>
+      <a href="https://developers.google.com/search/docs/fundamentals/seo-starter-guide" target="_blank" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg shadow-lg transition">Learn More About SEO</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-gray-900 text-gray-300 text-center py-6">
+    <p>© 2025 AEO Snippet Optimizer. All rights reserved.</p>
+  </footer>
+
+  <!-- JavaScript -->
+  <script>
+    document.getElementById('analyzeBtn').addEventListener('click', async () => {
+      const snippetA = document.getElementById('snippetA').value.trim();
+      const snippetB = document.getElementById('snippetB').value.trim();
+      const loading = document.getElementById('loading');
+      const resultSection = document.getElementById('result');
+      const resultText = document.getElementById('resultText');
+
+      if (!snippetA || !snippetB) {
+        alert("Please enter both snippets before analysis.");
+        return;
+      }
+
+      loading.classList.remove('hidden');
+      resultSection.classList.add('hidden');
+
+      try {
+        const response = await axios.post('/api/analyze', { snippetA, snippetB });
+        resultText.textContent = response.data.analysis;
+        resultSection.classList.remove('hidden');
+      } catch (error) {
+        resultText.textContent = "An error occurred: " + (error.response?.data?.message || error.message);
+        resultSection.classList.remove('hidden');
+      } finally {
+        loading.classList.add('hidden');
+      }
+    });
+  </script>
+</body>
+</html>
