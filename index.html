@@ -4,333 +4,97 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AEO Snippet Optimizer Dashboard</title>
-  <style>
-    :root {
-      --bg: #f5f7fb;
-      --card: #ffffff;
-      --text: #1f2937;
-      --accent: #0078ff;
-      --secondary: #22b573;
-      --shadow: rgba(0, 0, 0, 0.1);
-    }
-
-    [data-theme="dark"] {
-      --bg: #181a1f;
-      --card: #1e1f26;
-      --text: #f9fafb;
-      --accent: #3b82f6;
-      --secondary: #10b981;
-      --shadow: rgba(255, 255, 255, 0.05);
-    }
-
-    body {
-      margin: 0;
-      font-family: "Poppins", sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      overflow-x: hidden;
-      transition: background 0.4s, color 0.4s;
-    }
-
-    button {
-      cursor: pointer;
-      border: none;
-      outline: none;
-      transition: 0.3s ease;
-    }
-
-    /* ===== Sidebar ===== */
-    .sidebar {
-      position: fixed;
-      left: 0;
-      top: 0;
-      height: 100%;
-      width: 250px;
-      background: var(--card);
-      color: var(--text);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      box-shadow: 2px 0 10px var(--shadow);
-      padding: 20px;
-      transition: background 0.4s, color 0.4s;
-    }
-
-    .sidebar h2 {
-      text-align: center;
-      font-size: 22px;
-    }
-
-    .sidebar nav a {
-      display: block;
-      color: var(--text);
-      opacity: 0.8;
-      padding: 12px 15px;
-      border-radius: 8px;
-      text-decoration: none;
-      margin: 5px 0;
-      transition: 0.3s;
-    }
-
-    .sidebar nav a:hover {
-      background: var(--accent);
-      color: #fff;
-    }
-
-    .sidebar footer {
-      font-size: 12px;
-      text-align: center;
-      opacity: 0.7;
-    }
-
-    /* ===== Main ===== */
-    .main {
-      margin-left: 270px;
-      padding: 30px;
-      transition: margin 0.3s;
-    }
-
-    .header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 30px;
-    }
-
-    .header h1 {
-      font-size: 26px;
-    }
-
-    .btn-analyze {
-      background: var(--accent);
-      color: #fff;
-      padding: 10px 18px;
-      border-radius: 8px;
-      font-weight: 600;
-      box-shadow: 0 2px 8px var(--shadow);
-    }
-
-    .btn-analyze:hover {
-      opacity: 0.9;
-    }
-
-    /* ===== Inputs ===== */
-    .input-section {
-      background: var(--card);
-      box-shadow: 0 2px 10px var(--shadow);
-      padding: 20px;
-      border-radius: 12px;
-      margin-bottom: 20px;
-      transition: background 0.4s;
-    }
-
-    textarea {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      resize: none;
-      height: 100px;
-      background: var(--bg);
-      color: var(--text);
-      font-family: inherit;
-      font-size: 15px;
-      transition: background 0.4s, color 0.4s;
-    }
-
-    /* ===== Results ===== */
-    .results {
-      background: var(--card);
-      box-shadow: 0 2px 10px var(--shadow);
-      padding: 20px;
-      border-radius: 12px;
-      position: relative;
-      min-height: 120px;
-      transition: background 0.4s;
-    }
-
-    .results h2 {
-      margin-bottom: 15px;
-      font-size: 22px;
-      color: var(--accent);
-    }
-
-    pre {
-      background: rgba(0, 0, 0, 0.03);
-      padding: 15px;
-      border-radius: 8px;
-      overflow-x: auto;
-      font-size: 14px;
-      white-space: pre-wrap;
-      transition: background 0.4s;
-    }
-
-    /* ===== Loading Bar ===== */
-    .loading-bar {
-      width: 0;
-      height: 5px;
-      background: linear-gradient(90deg, var(--accent), var(--secondary));
-      border-radius: 5px;
-      transition: width 2s ease;
-    }
-
-    /* ===== Buttons ===== */
-    .btn-download,
-    .btn-theme {
-      margin-top: 15px;
-      background: var(--secondary);
-      color: #fff;
-      padding: 10px 18px;
-      border-radius: 8px;
-      font-weight: 600;
-      transition: 0.3s;
-    }
-
-    .btn-download:hover,
-    .btn-theme:hover {
-      opacity: 0.9;
-    }
-
-    /* ===== Responsive ===== */
-    @media (max-width: 768px) {
-      .sidebar {
-        position: relative;
-        width: 100%;
-        height: auto;
-        flex-direction: row;
-        justify-content: space-around;
-      }
-      .main {
-        margin-left: 0;
-      }
-    }
-  </style>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 </head>
-<body>
-  <aside class="sidebar">
-    <div>
-      <h2>🚀 AEO Optimizer</h2>
-      <nav>
-        <a href="#">Dashboard</a>
-        <a href="#">Comparative Analysis</a>
-        <a href="#">Reports</a>
-        <a href="#">Settings</a>
-      </nav>
-    </div>
-    <footer>© 2025 AEO Snippet Optimizer</footer>
-  </aside>
 
-  <main class="main">
-    <div class="header">
-      <h1>AI Snippet Analysis Dashboard</h1>
-      <div>
-        <button class="btn-theme" id="themeToggle">🌗 Toggle Theme</button>
-        <button class="btn-analyze" id="analyzeBtn">Analyze with AI</button>
+<body class="bg-gray-100 text-gray-800">
+  <div class="min-h-screen flex flex-col items-center justify-center px-4 py-8">
+    <div class="bg-white shadow-2xl rounded-2xl w-full max-w-5xl p-8">
+      <h1 class="text-3xl font-bold text-center text-blue-700 mb-6">📊 AEO Snippet Optimizer Dashboard</h1>
+
+      <div class="grid md:grid-cols-2 gap-6">
+        <div>
+          <label class="block text-sm font-semibold mb-2 text-gray-600">Snippet A</label>
+          <textarea id="snippetA" rows="5" class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500"></textarea>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold mb-2 text-gray-600">Snippet B</label>
+          <textarea id="snippetB" rows="5" class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500"></textarea>
+        </div>
       </div>
+
+      <div class="text-center mt-8">
+        <button id="analyzeBtn" class="bg-blue-600 text-white font-semibold px-6 py-3 rounded-lg hover:bg-blue-700 transition">Analyze with AI</button>
+      </div>
+
+      <div id="resultContainer" class="mt-10 hidden">
+        <h2 class="text-2xl font-bold text-center mb-4 text-blue-700">AI Comparative Analysis Result</h2>
+        <div id="result" class="bg-gray-50 border border-gray-200 p-6 rounded-lg text-sm whitespace-pre-wrap"></div>
+
+        <div class="text-center mt-6">
+          <button id="downloadExcel" class="bg-green-600 text-white font-semibold px-5 py-2 rounded-lg hover:bg-green-700 transition">⬇️ Download as Excel</button>
+        </div>
+      </div>
+
+      <div id="errorContainer" class="mt-6 hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg"></div>
     </div>
-
-    <div class="input-section">
-      <h3>Enter Snippet A</h3>
-      <textarea id="snippetA" placeholder="Paste your first snippet..."></textarea>
-
-      <h3 style="margin-top:15px;">Enter Snippet B</h3>
-      <textarea id="snippetB" placeholder="Paste your second snippet..."></textarea>
-    </div>
-
-    <div class="results" id="results">
-      <h2>AI Comparative Analysis Result</h2>
-      <div class="loading-bar" id="loadingBar"></div>
-      <pre id="resultContent">Results will appear here after analysis...</pre>
-    </div>
-
-    <button class="btn-download" id="downloadExcel">📥 Download as Excel</button>
-  </main>
+  </div>
 
   <script>
     const analyzeBtn = document.getElementById("analyzeBtn");
-    const loadingBar = document.getElementById("loadingBar");
-    const resultContent = document.getElementById("resultContent");
-    const themeToggle = document.getElementById("themeToggle");
+    const resultContainer = document.getElementById("resultContainer");
+    const resultBox = document.getElementById("result");
+    const errorBox = document.getElementById("errorContainer");
 
-    // Typing effect
-    function typeEffect(text, element) {
-      element.innerHTML = "";
-      let i = 0;
-      const speed = 20;
-      function typing() {
-        if (i < text.length) {
-          element.innerHTML += text.charAt(i);
-          i++;
-          setTimeout(typing, speed);
-        }
-      }
-      typing();
-    }
-
-    // AI Analysis Simulation
     analyzeBtn.addEventListener("click", async () => {
       const snippetA = document.getElementById("snippetA").value.trim();
       const snippetB = document.getElementById("snippetB").value.trim();
 
+      errorBox.classList.add("hidden");
+      resultContainer.classList.add("hidden");
+
       if (!snippetA || !snippetB) {
-        alert("Please enter both snippets before analyzing.");
+        errorBox.textContent = "❌ Please enter both snippets before analyzing.";
+        errorBox.classList.remove("hidden");
         return;
       }
 
-      resultContent.innerText = "Analyzing with AI...";
-      loadingBar.style.width = "0%";
-
-      setTimeout(() => (loadingBar.style.width = "80%"), 200);
+      analyzeBtn.disabled = true;
+      analyzeBtn.textContent = "Analyzing...";
 
       try {
-        const response = await fetch("/api/analyze", {
+        const res = await fetch("/api/analyze", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ snippetA, snippetB }),
+          body: JSON.stringify({ snippetA, snippetB })
         });
 
-        const data = await response.json();
-        loadingBar.style.width = "100%";
+        if (!res.ok) throw new Error("Server returned an error");
 
-        if (data.error) {
-          typeEffect("Error: " + data.error, resultContent);
-        } else {
-          typeEffect(data.result, resultContent);
+        const data = await res.json();
+        if (!data.result || typeof data.result !== "string" || data.result.length === 0) {
+          throw new Error("Invalid response format from AI");
         }
+
+        resultBox.textContent = data.result;
+        resultContainer.classList.remove("hidden");
       } catch (err) {
-        typeEffect("An error occurred: " + err.message, resultContent);
+        console.error(err);
+        errorBox.textContent = `⚠️ An error occurred: ${err.message}`;
+        errorBox.classList.remove("hidden");
+      } finally {
+        analyzeBtn.disabled = false;
+        analyzeBtn.textContent = "Analyze with AI";
       }
-
-      setTimeout(() => (loadingBar.style.width = "0%"), 2000);
     });
 
-    // Excel Download
+    // Export to Excel
     document.getElementById("downloadExcel").addEventListener("click", () => {
-      const content = document.getElementById("resultContent").innerText;
-      const blob = new Blob([content], { type: "application/vnd.ms-excel" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "AEO_Analysis_Result.xls";
-      a.click();
-      URL.revokeObjectURL(url);
-    });
-
-    // Theme Toggle
-    function setTheme(mode) {
-      document.documentElement.setAttribute("data-theme", mode);
-      localStorage.setItem("theme", mode);
-    }
-
-    const currentTheme = localStorage.getItem("theme") || "light";
-    setTheme(currentTheme);
-
-    themeToggle.addEventListener("click", () => {
-      const newTheme =
-        document.documentElement.getAttribute("data-theme") === "dark"
-          ? "light"
-          : "dark";
-      setTheme(newTheme);
+      const ws = XLSX.utils.table_to_sheet([[resultBox.textContent]]);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "AEO_Report");
+      XLSX.writeFile(wb, "AEO_Snippet_Report.xlsx");
     });
   </script>
 </body>
