@@ -91,78 +91,72 @@
 
   <!-- ✅ Final JavaScript -->
   <script>
-    const analyzeBtn = document.getElementById("analyzeBtn");
-    const loadingBar = document.getElementById("loadingBar");
-    const resultContent = document.getElementById("resultContent");
-    const resultContainer = document.getElementById("results");
+  document.getElementById('analyzeBtn').addEventListener('click', async () => {
+    const snippetA = document.getElementById('snippetA').value.trim();
+    const snippetB = document.getElementById('snippetB').value.trim();
+    const loading = document.getElementById('loading');
+    const resultSection = document.getElementById('result');
+    const resultText = document.getElementById('resultText');
 
-    function typeEffect(text, element, speed = 12) {
-      element.textContent = "";
-      let i = 0;
-      function typing() {
-        if (i < text.length) {
-          element.textContent += text.charAt(i);
-          i++;
-          setTimeout(typing, speed);
-        }
-      }
-      typing();
+    if (!snippetA || !snippetB) {
+      alert("Please enter both snippets before analysis.");
+      return;
     }
 
-    function showAIResult(payload) {
-      if (!payload) {
-        resultContent.textContent = "No response.";
-        return;
-      }
-      resultContainer.classList.remove("hidden");
+    loading.classList.remove('hidden');
+    resultSection.classList.add('hidden');
 
-      if (payload.html && payload.html.trim().length > 0) {
-        const clean = DOMPurify.sanitize(payload.html, {
-          ALLOWED_TAGS: ['b','i','strong','em','p','ul','ol','li','table','thead','tbody','tr','th','td','br','h1','h2','h3','h4','div','span'],
-          ALLOWED_ATTR: ['class','style']
-        });
-        resultContent.innerHTML = clean;
-      } else if (payload.result && payload.result.trim().length > 0) {
-        typeEffect(payload.result, resultContent, 8);
-      } else {
-        resultContent.textContent = "⚠️ No valid AI output received.";
-      }
+    try {
+      const response = await axios.post('/api/analyze', { snippetA, snippetB });
+      const analysis = response.data.analysis || "No analysis result received.";
+
+      resultText.textContent = analysis;
+      resultSection.classList.remove('hidden');
+    } catch (error) {
+      resultText.textContent = "⚠️ An error occurred: " + (error.response?.data?.message || error.message);
+      resultSection.classList.remove('hidden');
+    } finally {
+      loading.classList.add('hidden');
+    }
+  });
+
+  // 📄 Working PDF Download
+  document.getElementById('downloadPdf').addEventListener('click', () => {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    const title = "AEO Snippet Optimizer — Comparative Analysis Report";
+    const content = document.getElementById('resultText').innerText;
+    const date = new Date().toLocaleString();
+
+    doc.setFontSize(16);
+    doc.text(title, 10, 20);
+    doc.setFontSize(10);
+    doc.text(`Generated on: ${date}`, 10, 30);
+
+    const splitContent = doc.splitTextToSize(content, 180);
+    doc.text(splitContent, 10, 50);
+
+    doc.save("AEO_Analysis_Report.pdf");
+  });
+
+  // 📊 Working Excel Download
+  document.getElementById('downloadExcel').addEventListener('click', () => {
+    const content = document.getElementById('resultText').innerText;
+    if (!content.trim()) {
+      alert("No data available to export!");
+      return;
     }
 
-    analyzeBtn.addEventListener("click", async () => {
-      const snippetA = document.getElementById("snippetA").value.trim();
-      const snippetB = document.getElementById("snippetB").value.trim();
+    const lines = content.split("\n").filter(line => line.trim());
+    const data = lines.map(line => [line]);
 
-      if (!snippetA || !snippetB) {
-        alert("Please enter both snippets before analysis.");
-        return;
-      }
+    const ws = XLSX.utils.aoa_to_sheet([["AEO Snippet Optimizer — Comparative Analysis"], [""], ...data]);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "AEO Report");
+    XLSX.writeFile(wb, "AEO_Analysis_Report.xlsx");
+  });
+</script>
 
-      resultContent.textContent = "";
-      loadingBar.style.width = "0%";
-      resultContainer.classList.add("hidden");
-      setTimeout(() => { loadingBar.style.width = "70%"; }, 200);
-
-      try {
-        const res = await fetch("/api/analyze", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ snippetA, snippetB })
-        });
-
-        const data = await res.json();
-        if (!res.ok || data.success === false) {
-          showAIResult({ result: "⚠️ Error: " + (data.error || data.message || "Server error.") });
-        } else {
-          showAIResult(data);
-        }
-      } catch (err) {
-        showAIResult({ result: "⚠️ Network error: " + err.message });
-      } finally {
-        loadingBar.style.width = "100%";
-        setTimeout(() => { loadingBar.style.width = "0%"; }, 1000);
-      }
-    });
 
     // 📄 PDF Download
     document.getElementById("downloadPdf").addEventListener("click", () => {
