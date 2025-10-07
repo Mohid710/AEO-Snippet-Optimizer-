@@ -22,14 +22,29 @@ export default async function handler(req, res) {
         messages: [
           {
             role: "system",
-            content: "You are an advanced SEO expert specialized in Answer Engine Optimization (AEO) snippet analysis. You compare two snippets and provide a structured comparative report with clear metrics.",
+            content: "You are an advanced SEO expert specialized in Answer Engine Optimization (AEO) snippet analysis. Always provide results in a clear HTML-based structure suitable for a web dashboard. Include scoring, winner identification, and improvement tips."
           },
           {
             role: "user",
-            content: `Compare these two snippets for AEO performance:\n\nSnippet A:\n${snippetA}\n\nSnippet B:\n${snippetB}\n\nPlease evaluate based on relevance, clarity, structured data presence, FAQ formatting, and SERP appeal.`,
-          },
+            content: `Compare these two snippets for AEO performance:
+            Snippet A: ${snippetA}
+            Snippet B: ${snippetB}
+            
+            Evaluate based on:
+            1. Relevance
+            2. Clarity
+            3. Structured Data Presence
+            4. FAQ Formatting
+            5. SERP Appeal
+
+            Return a professional HTML report that includes:
+            - A scoring table (0–10)
+            - Summary section identifying the winner
+            - Key improvement tips (bullet points)
+            - Use soft colors and clean layout for readability.`
+          }
         ],
-        temperature: 0.3,
+        temperature: 0.4,
       }),
     });
 
