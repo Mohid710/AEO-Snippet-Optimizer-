@@ -3,171 +3,335 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AEO Snippet Optimizer — Smart SEO Insights</title>
-  
-  <!-- Tailwind CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <title>AEO Snippet Optimizer Dashboard</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --accent: #0078ff;
+      --secondary: #22b573;
+      --shadow: rgba(0, 0, 0, 0.1);
+    }
 
-  <!-- Axios + PDF + Excel -->
-  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    [data-theme="dark"] {
+      --bg: #181a1f;
+      --card: #1e1f26;
+      --text: #f9fafb;
+      --accent: #3b82f6;
+      --secondary: #10b981;
+      --shadow: rgba(255, 255, 255, 0.05);
+    }
+
+    body {
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      transition: background 0.4s, color 0.4s;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      outline: none;
+      transition: 0.3s ease;
+    }
+
+    /* ===== Sidebar ===== */
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 250px;
+      background: var(--card);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 2px 0 10px var(--shadow);
+      padding: 20px;
+      transition: background 0.4s, color 0.4s;
+    }
+
+    .sidebar h2 {
+      text-align: center;
+      font-size: 22px;
+    }
+
+    .sidebar nav a {
+      display: block;
+      color: var(--text);
+      opacity: 0.8;
+      padding: 12px 15px;
+      border-radius: 8px;
+      text-decoration: none;
+      margin: 5px 0;
+      transition: 0.3s;
+    }
+
+    .sidebar nav a:hover {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .sidebar footer {
+      font-size: 12px;
+      text-align: center;
+      opacity: 0.7;
+    }
+
+    /* ===== Main ===== */
+    .main {
+      margin-left: 270px;
+      padding: 30px;
+      transition: margin 0.3s;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 30px;
+    }
+
+    .header h1 {
+      font-size: 26px;
+    }
+
+    .btn-analyze {
+      background: var(--accent);
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-weight: 600;
+      box-shadow: 0 2px 8px var(--shadow);
+    }
+
+    .btn-analyze:hover {
+      opacity: 0.9;
+    }
+
+    /* ===== Inputs ===== */
+    .input-section {
+      background: var(--card);
+      box-shadow: 0 2px 10px var(--shadow);
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      transition: background 0.4s;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      resize: none;
+      height: 100px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 15px;
+      transition: background 0.4s, color 0.4s;
+    }
+
+    /* ===== Results ===== */
+    .results {
+      background: var(--card);
+      box-shadow: 0 2px 10px var(--shadow);
+      padding: 20px;
+      border-radius: 12px;
+      position: relative;
+      min-height: 120px;
+      transition: background 0.4s;
+    }
+
+    .results h2 {
+      margin-bottom: 15px;
+      font-size: 22px;
+      color: var(--accent);
+    }
+
+    pre {
+      background: rgba(0, 0, 0, 0.03);
+      padding: 15px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-size: 14px;
+      white-space: pre-wrap;
+      transition: background 0.4s;
+    }
+
+    /* ===== Loading Bar ===== */
+    .loading-bar {
+      width: 0;
+      height: 5px;
+      background: linear-gradient(90deg, var(--accent), var(--secondary));
+      border-radius: 5px;
+      transition: width 2s ease;
+    }
+
+    /* ===== Buttons ===== */
+    .btn-download,
+    .btn-theme {
+      margin-top: 15px;
+      background: var(--secondary);
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: 0.3s;
+    }
+
+    .btn-download:hover,
+    .btn-theme:hover {
+      opacity: 0.9;
+    }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 768px) {
+      .sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        justify-content: space-around;
+      }
+      .main {
+        margin-left: 0;
+      }
+    }
+  </style>
 </head>
-
-<body class="bg-gray-50 text-gray-900">
-  <!-- Header -->
-  <header class="bg-white shadow-md sticky top-0 z-50">
-    <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-      <h1 class="text-2xl font-extrabold text-blue-700">AEO Snippet Optimizer</h1>
+<body>
+  <aside class="sidebar">
+    <div>
+      <h2>🚀 AEO Optimizer</h2>
       <nav>
-        <a href="#compare" class="text-gray-600 hover:text-blue-700 font-medium px-4">Compare</a>
-        <a href="#about" class="text-gray-600 hover:text-blue-700 font-medium px-4">About</a>
+        <a href="#">Dashboard</a>
+        <a href="#">Comparative Analysis</a>
+        <a href="#">Reports</a>
+        <a href="#">Settings</a>
       </nav>
     </div>
-  </header>
+    <footer>© 2025 AEO Snippet Optimizer</footer>
+  </aside>
 
-  <!-- Hero Section -->
-  <section class="text-center py-16 bg-gradient-to-br from-blue-50 to-indigo-100">
-    <h2 class="text-4xl font-extrabold mb-4 text-gray-800">Boost Your SEO with AI-Powered Snippet Comparison</h2>
-    <p class="text-gray-600 text-lg mb-8">Compare and optimize your Answer Engine Optimization (AEO) snippets using advanced AI insights.</p>
-    <a href="#compare" class="bg-blue-700 hover:bg-blue-800 text-white font-semibold py-3 px-6 rounded-lg shadow-lg transition transform hover:-translate-y-1">Try Now — It’s Free!</a>
-  </section>
-
-  <!-- Comparison Tool -->
-  <section id="compare" class="max-w-5xl mx-auto px-6 py-16">
-    <h3 class="text-3xl font-bold text-center mb-10 text-gray-800">Compare Two Snippets Instantly</h3>
-
-    <div class="grid md:grid-cols-2 gap-8 mb-8">
+  <main class="main">
+    <div class="header">
+      <h1>AI Snippet Analysis Dashboard</h1>
       <div>
-        <label class="block text-sm font-semibold mb-2 text-gray-700">Snippet A</label>
-        <textarea id="snippetA" class="w-full p-4 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 h-48 resize-none" placeholder="Paste your first snippet here..."></textarea>
-      </div>
-
-      <div>
-        <label class="block text-sm font-semibold mb-2 text-gray-700">Snippet B</label>
-        <textarea id="snippetB" class="w-full p-4 border rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 h-48 resize-none" placeholder="Paste your second snippet here..."></textarea>
+        <button class="btn-theme" id="themeToggle">🌗 Toggle Theme</button>
+        <button class="btn-analyze" id="analyzeBtn">Analyze with AI</button>
       </div>
     </div>
 
-    <div class="text-center">
-      <button id="analyzeBtn" class="bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition transform hover:-translate-y-1">
-        Analyze with AI
-      </button>
+    <div class="input-section">
+      <h3>Enter Snippet A</h3>
+      <textarea id="snippetA" placeholder="Paste your first snippet..."></textarea>
+
+      <h3 style="margin-top:15px;">Enter Snippet B</h3>
+      <textarea id="snippetB" placeholder="Paste your second snippet..."></textarea>
     </div>
 
-    <!-- Loading Animation -->
-    <div id="loading" class="hidden text-center mt-6">
-      <div class="inline-block w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-      <p class="text-gray-600 mt-2">Analyzing snippets, please wait...</p>
+    <div class="results" id="results">
+      <h2>AI Comparative Analysis Result</h2>
+      <div class="loading-bar" id="loadingBar"></div>
+      <pre id="resultContent">Results will appear here after analysis...</pre>
     </div>
 
-    <!-- Result Section -->
-    <div id="result" class="mt-10 bg-white rounded-xl shadow-lg p-8 hidden">
-      <h4 class="text-2xl font-bold mb-4 text-blue-700">AI Comparative Analysis Result</h4>
-      <div id="resultText" class="whitespace-pre-wrap text-gray-800 leading-relaxed"></div>
+    <button class="btn-download" id="downloadExcel">📥 Download as Excel</button>
+  </main>
 
-      <!-- Download Buttons -->
-      <div class="mt-6 flex flex-wrap gap-4 justify-center">
-        <button id="downloadPdf" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-5 rounded-lg shadow transition">📄 Download Professional PDF Report</button>
-        <button id="downloadExcel" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-5 rounded-lg shadow transition">📊 Download Excel Report</button>
-      </div>
-    </div>
-  </section>
+  <script>
+    const analyzeBtn = document.getElementById("analyzeBtn");
+    const loadingBar = document.getElementById("loadingBar");
+    const resultContent = document.getElementById("resultContent");
+    const themeToggle = document.getElementById("themeToggle");
 
-  <!-- About Section -->
-  <section id="about" class="bg-white py-16">
-    <div class="max-w-5xl mx-auto px-6 text-center">
-      <h3 class="text-3xl font-bold mb-4 text-gray-800">Why AEO Matters?</h3>
-      <p class="text-gray-600 text-lg mb-6">Answer Engine Optimization helps your content stand out in AI-driven search results, voice assistants, and smart snippets. By comparing snippets, you identify which performs better in modern search contexts.</p>
-      <a href="https://developers.google.com/search/docs/fundamentals/seo-starter-guide" target="_blank" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg shadow-lg transition">Learn More About SEO</a>
-    </div>
-  </section>
+    // Typing effect
+    function typeEffect(text, element) {
+      element.innerHTML = "";
+      let i = 0;
+      const speed = 20;
+      function typing() {
+        if (i < text.length) {
+          element.innerHTML += text.charAt(i);
+          i++;
+          setTimeout(typing, speed);
+        }
+      }
+      typing();
+    }
 
-  <!-- Footer -->
-  <footer class="bg-gray-900 text-gray-300 text-center py-6">
-    <p>© 2025 AEO Snippet Optimizer. All rights reserved.</p>
-  </footer>
-
-  <!-- JavaScript -->
-    <script>
-    document.getElementById('analyzeBtn').addEventListener('click', async () => {
-      const snippetA = document.getElementById('snippetA').value.trim();
-      const snippetB = document.getElementById('snippetB').value.trim();
-      const loading = document.getElementById('loading');
-      const resultSection = document.getElementById('result');
-      const resultText = document.getElementById('resultText');
+    // AI Analysis Simulation
+    analyzeBtn.addEventListener("click", async () => {
+      const snippetA = document.getElementById("snippetA").value.trim();
+      const snippetB = document.getElementById("snippetB").value.trim();
 
       if (!snippetA || !snippetB) {
-        alert("⚠️ Please enter both snippets before analysis.");
+        alert("Please enter both snippets before analyzing.");
         return;
       }
 
-      loading.classList.remove('hidden');
-      resultSection.classList.add('hidden');
-      resultText.innerHTML = ""; // clear previous content
+      resultContent.innerText = "Analyzing with AI...";
+      loadingBar.style.width = "0%";
+
+      setTimeout(() => (loadingBar.style.width = "80%"), 200);
 
       try {
-        const response = await axios.post('/api/analyze', { snippetA, snippetB });
+        const response = await fetch("/api/analyze", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ snippetA, snippetB }),
+        });
 
-        // ✅ Fix: Show the response safely as formatted text
-        const aiResult = response.data.analysis || "No response received from AI.";
-        resultText.innerText = aiResult;
+        const data = await response.json();
+        loadingBar.style.width = "100%";
 
-        // Show result box
-        resultSection.classList.remove('hidden');
-      } catch (error) {
-        console.error(error);
-        resultText.innerText = "❌ An error occurred: " + (error.response?.data?.message || error.message);
-        resultSection.classList.remove('hidden');
-      } finally {
-        loading.classList.add('hidden');
-      }
-    });
-
-    // 📄 Professional PDF Download
-    document.getElementById('downloadPdf').addEventListener('click', () => {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF({ unit: "pt", format: "a4" });
-
-      const title = "AEO Snippet Optimizer — Comparative Analysis Report";
-      const content = document.getElementById('resultText').innerText;
-      const date = new Date().toLocaleString();
-
-      // Header
-      doc.setFontSize(18);
-      doc.text(title, 40, 60);
-      doc.setFontSize(10);
-      doc.text(`Generated on: ${date}`, 40, 80);
-
-      // Body
-      doc.setFontSize(12);
-      const lines = doc.splitTextToSize(content, 520);
-      doc.text(lines, 40, 110);
-
-      // Footer
-      doc.setFontSize(10);
-      doc.text("© 2025 AEO Snippet Optimizer — Powered by AI & OpenRouter GPT-4 Turbo", 40, 780);
-
-      doc.save("AEO_Comparative_Analysis_Report.pdf");
-    });
-
-    // 📊 Excel Download
-    document.getElementById('downloadExcel').addEventListener('click', () => {
-      const content = document.getElementById('resultText').innerText.trim();
-      if (!content) {
-        alert("⚠️ No result available to download yet.");
-        return;
+        if (data.error) {
+          typeEffect("Error: " + data.error, resultContent);
+        } else {
+          typeEffect(data.result, resultContent);
+        }
+      } catch (err) {
+        typeEffect("An error occurred: " + err.message, resultContent);
       }
 
-      const ws = XLSX.utils.aoa_to_sheet([
-        ["AEO Snippet Optimizer - Comparative Report"],
-        ["Generated on:", new Date().toLocaleString()],
-        [""],
-        [content]
-      ]);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "AEO Analysis");
-      XLSX.writeFile(wb, "AEO_Analysis_Report.xlsx");
+      setTimeout(() => (loadingBar.style.width = "0%"), 2000);
+    });
+
+    // Excel Download
+    document.getElementById("downloadExcel").addEventListener("click", () => {
+      const content = document.getElementById("resultContent").innerText;
+      const blob = new Blob([content], { type: "application/vnd.ms-excel" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "AEO_Analysis_Result.xls";
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    // Theme Toggle
+    function setTheme(mode) {
+      document.documentElement.setAttribute("data-theme", mode);
+      localStorage.setItem("theme", mode);
+    }
+
+    const currentTheme = localStorage.getItem("theme") || "light";
+    setTheme(currentTheme);
+
+    themeToggle.addEventListener("click", () => {
+      const newTheme =
+        document.documentElement.getAttribute("data-theme") === "dark"
+          ? "light"
+          : "dark";
+      setTheme(newTheme);
     });
   </script>
+</body>
+</html>
